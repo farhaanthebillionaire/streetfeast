@@ -1,0 +1,97 @@
+rules_version = '2';
+service cloud.firestore {
+  // Helper functions
+  function isSignedIn() {
+    return request.auth != null;
+  }
+  
+  function getRole() {
+    return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+  }
+  
+  function isAdmin() {
+    return isSignedIn() && getRole() == 'admin';
+  }
+  
+  function isVendor() {
+    return isSignedIn() && getRole() == 'vendor';
+  }
+  
+  function isCustomer() {
+    return isSignedIn() && getRole() == 'customer';
+  }
+  
+  function isSupplier() {
+    return isSignedIn() && getRole() == 'supplier';
+  }
+  
+  function isOwner(userId) {
+    return request.auth.uid == userId;
+  }
+  
+  // Global rules
+  match /databases/{database}/documents {
+    // Users collection
+    match /users/{userId} {
+      // Users can read their own data
+      allow read: if isSignedIn() && isOwner(userId);
+      // Users can update their own profile
+      allow update: if isSignedIn() && isOwner(userId);
+      // Only admins can create/delete user documents
+      allow create, delete: if isAdmin();
+    }
+    
+    // Vendors collection
+    match /vendors/{vendorId} {
+      // Anyone can read vendor profiles
+      allow read: if true;
+      // Only vendor owner or admin can update
+      allow write: if isSignedIn() && (isVendor() || isAdmin());
+    }
+    
+    // Products collection
+    match /products/{productId} {
+      // Anyone can read products
+      allow read: if true;
+      // Only suppliers can create/update their products
+      allow create, update: if isSignedIn() && (isSupplier() || isAdmin());
+      // Only admins can delete products
+      allow delete: if isAdmin();
+    }
+    
+    // Orders collection
+    match /orders/{orderId} {
+      // Customers can read their own orders
+      // Vendors can read orders for their business
+      allow read: if isSignedIn() && (
+        (isCustomer() && resource.data.customerId == request.auth.uid) ||
+        (isVendor() && resource.data.vendorId == request.auth.uid) ||
+        isAdmin()
+      );
+      
+      // Customers can create orders
+      // Vendors can update order status
+      allow create: if isSignedIn() && isCustomer();
+      allow update: if isSignedIn() && (
+        (isVendor() && resource.data.vendorId == request.auth.uid) ||
+        isAdmin()
+      );
+    }
+    
+    // Reviews collection
+    match /reviews/{reviewId} {
+      // Anyone can read reviews
+      allow read: if true;
+      // Only customers can create reviews for their orders
+      allow create: if isSignedIn() && isCustomer() && 
+        request.resource.data.customerId == request.auth.uid;
+      // Only admins can delete reviews
+      allow delete: if isAdmin();
+    }
+    
+    // Default deny all other operations
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
