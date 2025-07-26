@@ -166,19 +166,16 @@ graph TD
     npm --version
     ```
 
-- **pnpm 8.x** (Faster, disk space efficient package manager)
+- **npm** (Node Package Manager)
   ```bash
-  # Install pnpm globally
-  npm install -g pnpm
-  
-  # Verify installation
-  pnpm --version
+  # Verify npm installation
+  npm --version
   ```
 
 - **Firebase CLI** (For deployment and Firebase tools)
   ```bash
   # Install Firebase CLI globally
-  pnpm add -g firebase-tools
+  npm install -g firebase-tools
   
   # Verify installation
   firebase --version
@@ -226,11 +223,8 @@ cd streetfeast
 #### 2. Install Dependencies
 
 ```bash
-# Install all dependencies using pnpm
-pnpm install
-
-# If you encounter any permission issues on Linux/macOS, try:
-# pnpm install --unsafe-perm
+# Install all dependencies
+npm install
 ```
 
 #### 3. Configure Environment Variables
@@ -267,27 +261,27 @@ pnpm install
 
 ```bash
 # Start the development server
-pnpm dev
+npm run dev
 
 # The application will be available at:
 # http://localhost:5173
 
 # For production build
-pnpm build
-pnpm preview
+npm run build
+npm run preview
 ```
 
 #### 6. Running Tests
 
 ```bash
 # Run all tests
-pnpm test
+npm test
 
 # Run tests in watch mode
-pnpm test:watch
+npm test -- --watch
 
 # Generate test coverage report
-pnpm test:coverage
+npm test -- --coverage
 ```
 
 ### Common Setup Issues
@@ -298,9 +292,9 @@ pnpm test:coverage
    - Ensure the Firebase project has the required services enabled
 
 2. **Dependency Installation**
-   - Clear pnpm store: `pnpm store prune`
-   - Delete `node_modules` and `pnpm-lock.yaml`
-   - Run `pnpm install` again
+   - Clear npm cache: `npm cache clean --force`
+   - Delete `node_modules` and `package-lock.json`
+   - Run `npm install` again
 
 3. **Environment Variables**
    - Ensure all required variables are set in `.env`
@@ -310,7 +304,7 @@ pnpm test:coverage
 4. **Port Conflicts**
    - If port 5173 is in use, you can specify a different port:
      ```bash
-     pnpm dev --port 3000
+     npm run dev -- --port 3000
      ```
 
 ## 🚀 Deployment Guide
@@ -321,7 +315,7 @@ Create an optimized production build:
 
 ```bash
 # Create production build
-pnpm build
+npm run build
 
 # The build output will be in the 'dist' directory
 ```
@@ -348,7 +342,7 @@ pnpm build
 2. **Deploy to Firebase Hosting**:
    ```bash
    # Build the project
-   pnpm build
+   npm run build
    
    # Deploy to Firebase
    firebase deploy --only hosting
@@ -410,18 +404,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'pnpm'
-      
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8.x
+          cache: 'npm'
       
       - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
       
       - name: Build
-        run: pnpm build
+        run: npm run build
         env:
           VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
