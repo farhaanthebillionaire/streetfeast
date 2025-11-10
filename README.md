@@ -8,7 +8,7 @@
 
 ## 🚀 Project Overview
 
-StreetFeast is a modern, full-stack food delivery platform connecting customers with local food vendors and suppliers. Built with React 19, TypeScript, and Firebase, it offers a seamless experience for customers, vendors, and suppliers with role-based access control, real-time updates, and a beautiful, responsive UI.
+StreetFeast is a modern full-stack food delivery platform connecting customers with local food vendors and suppliers. Built with React 19, TypeScript, and Firebase, it offers a seamless experience for customers, vendors, and suppliers with role-based access control, real-time updates, and a beautiful, responsive UI.
 
 ## ✨ Key Features
 
